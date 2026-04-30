@@ -1,11 +1,12 @@
 import streamlit as st
 import json
 import difflib
+import random
 
 st.set_page_config(page_title="어휘 확장 네트워크 앱", page_icon="🌐")
 
 st.title("🌐 어휘 확장 네트워크 앱")
-st.write("단어를 입력하면 의미 + 카테고리 기반으로 어휘가 확장됩니다!")
+st.write("단어를 입력하면 의미 + 카테고리 + 퀴즈까지 제공됩니다!")
 
 # -------------------------------
 # 데이터 불러오기
@@ -91,7 +92,29 @@ if word:
         else:
             st.write("확장된 어휘가 없습니다.")
 
-    # 2️⃣ 없는 단어 처리 + 추천
+        # ⭐ 퀴즈 기능 추가
+        st.divider()
+        st.subheader("🎯 어휘 퀴즈")
+
+        if vocab[word]["반의어"]:
+            correct = vocab[word]["반의어"][0]
+
+            # 보기 만들기
+            options = vocab[word]["유의어"] + [correct]
+            options = list(set(options))
+            random.shuffle(options)
+
+            answer = st.radio(f"'{word}'의 반의어는?", options)
+
+            if answer:
+                if answer == correct:
+                    st.success("정답입니다! 👏")
+                else:
+                    st.error("틀렸어요 😢")
+        else:
+            st.write("👉 퀴즈를 만들 수 없는 단어예요.")
+
+    # 2️⃣ 없는 단어 처리
     else:
         st.warning("사전에 없는 단어예요 😢")
 
@@ -113,7 +136,7 @@ if word:
         else:
             st.write("👉 비슷한 단어를 찾지 못했어요.")
 
-    # 3️⃣ ⭐ 카테고리 확장 (핵심 추가 기능)
+    # 3️⃣ 카테고리 확장
     if found_category:
         st.divider()
         st.subheader(f"📦 '{word}'는 '{found_category}'에 속해요!")
